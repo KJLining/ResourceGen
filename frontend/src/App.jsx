@@ -4,6 +4,9 @@ import LandingPage from "./pages/landingpage"
 import BookLayout from "./modules/bookselling/layout/booklayout"
 import BookDashboard from "./modules/bookselling/pages/bookdashboard"
 import ProfPage from "./modules/bookselling/pages/profpage"
+import PublisherPage from "./modules/bookselling/pages/publisherpage"
+import Inventory from "./modules/bookselling/pages/inventory"
+
 function App() {
   
 
@@ -16,6 +19,8 @@ function App() {
           <Route element={<BookLayout />}>
             <Route path="/bookdashboard" element={<BookDashboard />} />
             <Route path="/profpage" element={<ProfPage />} />
+            <Route path="/publisherpage" element={<PublisherPage />} />
+            <Route path="/inventory" element={<Inventory />} />
           </Route>
         </Routes>
       </BrowserRouter>

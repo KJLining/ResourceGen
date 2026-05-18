@@ -15,8 +15,8 @@ export default function Table({
       td: "px-3 py-1.5 text-sm leading-tight",
     },
     lg: {
-      th: "px-5 py-3",
-      td: "px-5 py-3",
+      th: "px-5 py-1.5",
+      td: "px-5 py-1.5",
     },
   };
 
