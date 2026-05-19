@@ -6,7 +6,7 @@ export default function BookSidebar() {
             <Link to="/profpage" className="block py-2 px-4 hover:bg-green-600 rounded">Professors List</Link>
             <Link to="/publisherpage" className="block py-2 px-4 hover:bg-green-600 rounded">Publishers List</Link>
             <Link to="/inventory" className="block py-2 px-4 hover:bg-green-600 rounded">Inventory</Link>
-            <Link to="/dailysales" className="block py-2 px-4 hover:bg-green-600 rounded">Buy Book</Link>
+            <Link to="/buybook" className="block py-2 px-4 hover:bg-green-600 rounded">Buy Book</Link>
             <Link to="/reports" className="block py-2 px-4 hover:bg-green-600 rounded">Reports</Link>
             <Link to="/remittances" className="block py-2 px-4 hover:bg-green-600 rounded">Remittances</Link>
             <Link to="/" className="block py-2 px-4 hover:bg-green-600 rounded">Exit</Link>

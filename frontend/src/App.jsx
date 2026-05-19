@@ -6,6 +6,12 @@ import BookDashboard from "./modules/bookselling/pages/bookdashboard"
 import ProfPage from "./modules/bookselling/pages/profpage"
 import PublisherPage from "./modules/bookselling/pages/publisherpage"
 import Inventory from "./modules/bookselling/pages/inventory"
+import ProfDetailsPage from "./modules/bookselling/components/view/profdetailspage"
+import PublisherDetailPage from "./modules/bookselling/components/view/publisherdetailpage"
+import BookDetailPage from "./modules/bookselling/components/view/bookdetailpage"
+import BuyBook from "./modules/bookselling/pages/buybook"
+import Reports from "./modules/bookselling/pages/reports"
+import Remittances from "./modules/bookselling/pages/remittances"
 
 function App() {
   
@@ -21,6 +27,15 @@ function App() {
             <Route path="/profpage" element={<ProfPage />} />
             <Route path="/publisherpage" element={<PublisherPage />} />
             <Route path="/inventory" element={<Inventory />} />
+            <Route
+                path="/admin/professors/:id"
+                element={<ProfDetailsPage />}
+            />
+            <Route path="/publisherdetail/:id" element={<PublisherDetailPage />} />
+            <Route path="/bookdetail/:id" element={<BookDetailPage />} />
+            <Route path="/buybook" element={<BuyBook />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/remittances" element={<Remittances />} />
           </Route>
         </Routes>
       </BrowserRouter>
