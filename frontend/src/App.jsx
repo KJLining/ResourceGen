@@ -13,6 +13,19 @@ import BuyBook from "./modules/bookselling/pages/buybook"
 import Reports from "./modules/bookselling/pages/reports"
 import Remittances from "./modules/bookselling/pages/remittances"
 
+import PrintingLayout from "./modules/printingservices/layout/printinglayout"
+import PrintingDashboard from "./modules/printingservices/pages/printingdashboard"
+import AllRequests from "./modules/printingservices/pages/allrequests"
+import ReceivedRequests from "./modules/printingservices/pages/receivedrequests"
+import ReadyForPickup from "./modules/printingservices/pages/readyforpickup"
+import ClaimedRequests from "./modules/printingservices/pages/claimedrequests"
+import CancelledRequests from "./modules/printingservices/pages/cancelledrequests"
+import PrintingReports from "./modules/printingservices/pages/reports"
+import PrintingLists from "./modules/printingservices/pages/printinglists"
+import ForBinding from "./modules/printingservices/pages/forbinding"
+import ClaimingList from "./modules/printingservices/pages/claiminglist"
+
+
 function App() {
   
 
@@ -37,6 +50,57 @@ function App() {
             <Route path="/reports" element={<Reports />} />
             <Route path="/remittances" element={<Remittances />} />
           </Route>
+
+<Route element={<PrintingLayout />}>
+
+    <Route
+        path="/printingdashboard"
+        element={<PrintingDashboard />}
+    />
+
+    <Route
+        path="/allrequests"
+        element={<AllRequests />}
+    />
+    <Route
+        path="/receivedrequests"
+        element={<ReceivedRequests />}
+    />
+    <Route
+        path="/forbinding"
+        element={<ForBinding />}
+    />
+
+    <Route
+        path="/readyforpickup"
+        element={<ReadyForPickup />}
+    />
+
+    <Route
+        path="/claimedrequests"
+        element={<ClaimedRequests />}
+    />
+
+    <Route
+        path="/cancelledrequests"
+        element={<CancelledRequests />}
+    />
+
+    <Route
+        path="/printingreports"
+        element={<PrintingReports />}
+    />
+    
+    <Route
+        path="/printinglists"
+        element={<PrintingLists />}
+    />
+    <Route
+        path="/claiminglist"
+        element={<ClaimingList />}
+    />
+</Route>
+
         </Routes>
       </BrowserRouter>
     </>

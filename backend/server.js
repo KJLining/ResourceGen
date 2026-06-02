@@ -33,6 +33,29 @@ app.use('/api/reports', reportsRouter);
 const remittancesRouter = require('./routes/remittances');
 app.use('/api/remittances', remittancesRouter);
 
+const printingServicesRouter = require('./routes/printingservices');
+app.use('/api/printing-services', printingServicesRouter);
+
+const printingReportsRouter =
+require("./routes/printingReports")
+
+app.use(
+    "/api/printing-reports",
+    printingReportsRouter
+)
+
+const printingListsRouter =
+require("./routes/printinglists")
+
+const printingClaimingRouter = require('./routes/printingclaiming')
+app.use('/api/printing-claiming', printingClaimingRouter)
+
+app.use(
+    "/api/printing-lists",
+    printingListsRouter
+)
+
+
 // Test route
 app.get('/', (req, res) => {
     res.json({ message: 'ResourceGen API is running!' });

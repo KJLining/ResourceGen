@@ -15,13 +15,13 @@ export default function LandingPage() {
                             <span className="text-2xl">Book Selling</span>
                         </Button>
                     </Link>
-                    <Link to="/printdashboard">
+                    <Link to="/printingdashboard">
                         <Button variant="primary" className="flex justify-center items-center gap-2 w-md">
                             <Printer size={20} />
                             <span className="text-2xl">Printing Services</span>
                         </Button>
                     </Link>
-                    <Link to="/condashboard">
+                    <Link to="/concessionairelist">
                         <Button variant="primary" className="flex justify-center items-center gap-2 w-md">
                             <UserRound size={20} />
                             <span className="text-2xl">Concessionaires</span>
