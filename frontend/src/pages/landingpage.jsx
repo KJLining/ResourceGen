@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import Topbar from "../components/topbar"
 import Button from "../components/ui/button"
-import { Book, Printer, Store, Banknote, Users } from "lucide-react"
+import { Book, Printer, Users } from "lucide-react"
 
 export default function LandingPage() {
     return (
@@ -26,18 +26,6 @@ export default function LandingPage() {
                         <Button variant="primary" className="flex justify-center items-center gap-2 w-md">
                             <Users size={20} />
                             <span className="text-2xl">Concessionaires</span>
-                        </Button>
-                    </Link>
-                    <Link to="/rentdashboard">
-                        <Button variant="primary" className="flex justify-center items-center gap-2 w-md">
-                            <Store size={20} />
-                            <span className="text-2xl">Rentals</span>
-                        </Button>
-                    </Link>
-                    <Link to="/igpdashboard">
-                        <Button variant="primary" className="flex justify-center items-center gap-2 w-md">
-                            <Banknote size={20} />
-                            <span className="text-2xl">Department IGP</span>
                         </Button>
                     </Link>
                 </div>
