@@ -25,85 +25,58 @@ import PrintingLists from "./modules/printingservices/pages/printinglists"
 import ForBinding from "./modules/printingservices/pages/forbinding"
 import ClaimingList from "./modules/printingservices/pages/claiminglist"
 
+import ConcessionaireLayout from "./modules/concessionaires/layout/concessionairelayout"
+import ConcessionaireDashboard from "./modules/concessionaires/pages/concessionairedashboard"
+import ConcessionaireListPage from "./modules/concessionaires/pages/concessionairelist"
+import ConcessionaireDetailPage from "./modules/concessionaires/pages/concessionairedetailpage"
+import BillsPage from "./modules/concessionaires/pages/billspage"
+import DocumentsPage from "./modules/concessionaires/pages/documentspage"
 
 function App() {
-  
-
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
 
-          <Route element={<BookLayout />}>
-            <Route path="/bookdashboard" element={<BookDashboard />} />
-            <Route path="/profpage" element={<ProfPage />} />
-            <Route path="/publisherpage" element={<PublisherPage />} />
-            <Route path="/inventory" element={<Inventory />} />
-            <Route
-                path="/admin/professors/:id"
-                element={<ProfDetailsPage />}
-            />
-            <Route path="/publisherdetail/:id" element={<PublisherDetailPage />} />
-            <Route path="/bookdetail/:id" element={<BookDetailPage />} />
-            <Route path="/buybook" element={<BuyBook />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/remittances" element={<Remittances />} />
-          </Route>
+        {/* ── Book Selling ── */}
+        <Route element={<BookLayout />}>
+          <Route path="/bookdashboard" element={<BookDashboard />} />
+          <Route path="/profpage" element={<ProfPage />} />
+          <Route path="/publisherpage" element={<PublisherPage />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/admin/professors/:id" element={<ProfDetailsPage />} />
+          <Route path="/publisherdetail/:id" element={<PublisherDetailPage />} />
+          <Route path="/bookdetail/:id" element={<BookDetailPage />} />
+          <Route path="/buybook" element={<BuyBook />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/remittances" element={<Remittances />} />
+        </Route>
 
-<Route element={<PrintingLayout />}>
+        {/* ── Printing Services ── */}
+        <Route element={<PrintingLayout />}>
+          <Route path="/printingdashboard" element={<PrintingDashboard />} />
+          <Route path="/allrequests" element={<AllRequests />} />
+          <Route path="/receivedrequests" element={<ReceivedRequests />} />
+          <Route path="/forbinding" element={<ForBinding />} />
+          <Route path="/readyforpickup" element={<ReadyForPickup />} />
+          <Route path="/claimedrequests" element={<ClaimedRequests />} />
+          <Route path="/cancelledrequests" element={<CancelledRequests />} />
+          <Route path="/printingreports" element={<PrintingReports />} />
+          <Route path="/printinglists" element={<PrintingLists />} />
+          <Route path="/claiminglist" element={<ClaimingList />} />
+        </Route>
 
-    <Route
-        path="/printingdashboard"
-        element={<PrintingDashboard />}
-    />
+        {/* ── Concessionaires ── */}
+        <Route element={<ConcessionaireLayout />}>
+          <Route path="/concessionaires" element={<ConcessionaireDashboard />} />
+          <Route path="/concessionaires/list" element={<ConcessionaireListPage />} />
+          <Route path="/concessionaires/list/:id" element={<ConcessionaireDetailPage />} />
+          <Route path="/concessionaires/bills" element={<BillsPage />} />
+          <Route path="/concessionaires/documents" element={<DocumentsPage />} />
+        </Route>
 
-    <Route
-        path="/allrequests"
-        element={<AllRequests />}
-    />
-    <Route
-        path="/receivedrequests"
-        element={<ReceivedRequests />}
-    />
-    <Route
-        path="/forbinding"
-        element={<ForBinding />}
-    />
-
-    <Route
-        path="/readyforpickup"
-        element={<ReadyForPickup />}
-    />
-
-    <Route
-        path="/claimedrequests"
-        element={<ClaimedRequests />}
-    />
-
-    <Route
-        path="/cancelledrequests"
-        element={<CancelledRequests />}
-    />
-
-    <Route
-        path="/printingreports"
-        element={<PrintingReports />}
-    />
-    
-    <Route
-        path="/printinglists"
-        element={<PrintingLists />}
-    />
-    <Route
-        path="/claiminglist"
-        element={<ClaimingList />}
-    />
-</Route>
-
-        </Routes>
-      </BrowserRouter>
-    </>
+      </Routes>
+    </BrowserRouter>
   )
 }
 

@@ -55,6 +55,8 @@ app.use(
     printingListsRouter
 )
 
+const concessionairesRouter = require("./routes/concessionaires");
+app.use("/api/concessionaires", concessionairesRouter);
 
 // Test route
 app.get('/', (req, res) => {
