@@ -12,6 +12,19 @@ const EMPTY = {
 
 const MONTHS = ["","January","February","March","April","May","June","July","August","September","October","November","December"];
 
+const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
+
+function Field({ label, children, required }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-500 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 export default function BillFormModal({ concessionaireId, data, baseRent, onClose, onSaved }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -55,14 +68,6 @@ export default function BillFormModal({ concessionaireId, data, baseRent, onClos
       setSaving(false);
     }
   };
-
-  const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
-  const Field = ({ label, children, required }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -108,7 +113,6 @@ export default function BillFormModal({ concessionaireId, data, baseRent, onClos
             <input className={inputClass} value={form.other_fees_label} onChange={e => set("other_fees_label", e.target.value)} placeholder="e.g. Garbage fee" />
           </Field>
 
-          {/* Total preview */}
           <div className="bg-gray-50 rounded-lg px-4 py-3 flex justify-between text-sm">
             <span className="text-gray-500">Computed Total</span>
             <span className="font-bold text-gray-800">₱{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>

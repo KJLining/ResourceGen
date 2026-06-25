@@ -12,6 +12,7 @@ import BookDetailPage from "./modules/bookselling/components/view/bookdetailpage
 import BuyBook from "./modules/bookselling/pages/buybook"
 import Reports from "./modules/bookselling/pages/reports"
 import Remittances from "./modules/bookselling/pages/remittances"
+import Settings from "./modules/bookselling/pages/settings"
 
 import PrintingLayout from "./modules/printingservices/layout/printinglayout"
 import PrintingDashboard from "./modules/printingservices/pages/printingdashboard"
@@ -50,6 +51,7 @@ function App() {
           <Route path="/buybook" element={<BuyBook />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/remittances" element={<Remittances />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* ── Printing Services ── */}

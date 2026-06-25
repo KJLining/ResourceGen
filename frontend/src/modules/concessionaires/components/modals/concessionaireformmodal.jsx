@@ -8,6 +8,19 @@ const EMPTY = {
   base_rent: "", status: "Active", notes: "",
 };
 
+const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
+
+function Field({ label, children, required }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-500 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 export default function ConcessionaireFormModal({ data, onClose, onSaved }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -45,17 +58,6 @@ export default function ConcessionaireFormModal({ data, onClose, onSaved }) {
       setSaving(false);
     }
   };
-
-  const Field = ({ label, children, required }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 mb-1">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-
-  const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">

@@ -9,6 +9,7 @@ export default function BookSidebar() {
             <Link to="/buybook" className="block py-2 px-4 hover:bg-green-600 rounded">Buy Book</Link>
             <Link to="/reports" className="block py-2 px-4 hover:bg-green-600 rounded">Reports</Link>
             <Link to="/remittances" className="block py-2 px-4 hover:bg-green-600 rounded">Remittances</Link>
+            <Link to="/settings" className="block py-2 px-4 hover:bg-green-600 rounded">Settings</Link>
             <Link to="/" className="block py-2 px-4 hover:bg-green-600 rounded">Exit</Link>
         </div>
     )

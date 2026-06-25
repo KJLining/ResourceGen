@@ -33,6 +33,7 @@ export default function Inventory() {
     const [bookForm, setBookForm] = useState(emptyBook);
     const [deliveryForm, setDeliveryForm] = useState(emptyDelivery);
     const [error, setError] = useState('');
+
     const fetchBooks = useCallback((search = '') => {
         setLoading(true);
         api.get(`/books?search=${search}`)
@@ -45,21 +46,11 @@ export default function Inventory() {
             .then(res => setDeliveries(res.data));
     }, []);
 
+    // ✅ Single useEffect — removed the duplicate
     useEffect(() => {
         fetchBooks();
         fetchDeliveries();
     }, [fetchBooks, fetchDeliveries]);
-    
-    useEffect(() => {
-        setLoading(true);
-        api.get('/books')
-            .then(res => setBooks(res.data))
-            .finally(() => setLoading(false));
-    
-        api.get('/deliveries')
-            .then(res => setDeliveries(res.data));
-    }, []);
-
 
     const openAddBook = () => {
         setBookForm(emptyBook);
@@ -89,11 +80,18 @@ export default function Inventory() {
         setModal('deleteBook');
     };
 
-    const openAddDelivery = () => {
-        setDeliveryForm(emptyDelivery);
-        setError('');
-        setModal('addDelivery');
-    };
+const openAddDelivery = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const rand = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const reference_no = `DR-${year}${month}${day}-${rand}`;
+
+    setDeliveryForm({ ...emptyDelivery, reference_no });
+    setError('');
+    setModal('addDelivery');
+};
 
     const closeModal = () => {
         setModal(null);
@@ -154,7 +152,6 @@ export default function Inventory() {
         <>
             <h1 className="text-2xl font-bold text-center mb-5">Inventory</h1>
 
-            {/* Tabs */}
             <div className="flex border-b mb-4">
                 <button
                     onClick={() => setTab('books')}
@@ -178,7 +175,6 @@ export default function Inventory() {
                 </button>
             </div>
 
-            {/* Books Tab */}
             {tab === 'books' && (
                 <>
                     <div className="flex justify-between items-center mb-4">
@@ -197,7 +193,6 @@ export default function Inventory() {
                 </>
             )}
 
-            {/* Deliveries Tab */}
             {tab === 'deliveries' && (
                 <>
                     <div className="flex justify-end mb-4">

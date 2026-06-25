@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Pencil, Trash2, Eye } from "lucide-react";
 import api from "../../../api";
@@ -20,15 +20,15 @@ export default function ConcessionaireListPage() {
   const [deleting, setDeleting] = useState(null);
   const navigate = useNavigate();
 
-  const fetchAll = () => {
+  const fetchAll = useCallback(() => {
     setLoading(true);
     api.get("/concessionaires")
       .then(r => setConcessionaires(r.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  };
+  }, []);
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const filtered = concessionaires.filter(c =>
     `${c.name} ${c.business_name} ${c.type} ${c.unit_location}`

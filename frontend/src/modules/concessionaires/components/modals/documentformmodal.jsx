@@ -1,31 +1,60 @@
-import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, Paperclip, FileX } from "lucide-react";
 import api from "../../../../api";
 
 const EMPTY = {
   document_type: "Contract", title: "", description: "",
-  file_path: "", file_name: "", document_date: "", expiry_date: "", remarks: "",
+  document_date: "", expiry_date: "", remarks: "",
 };
+
+const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
+
+function Field({ label, children, required }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-500 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
 
 export default function DocumentFormModal({ concessionaireId, data, onClose, onSaved }) {
   const [form, setForm] = useState(EMPTY);
+  const [file, setFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
   const isEdit = !!data;
 
   useEffect(() => {
     if (data) {
       setForm({
-        ...data,
+        document_type: data.document_type || "Contract",
+        title: data.title || "",
+        description: data.description || "",
         document_date: data.document_date?.slice(0, 10) || "",
         expiry_date: data.expiry_date?.slice(0, 10) || "",
+        remarks: data.remarks || "",
       });
     } else {
       setForm(EMPTY);
     }
+    setFile(null);
   }, [data]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    if (selected) setFile(selected);
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async () => {
     if (!form.title || !form.document_type) {
@@ -34,8 +63,20 @@ export default function DocumentFormModal({ concessionaireId, data, onClose, onS
     }
     setSaving(true);
     try {
-      if (isEdit) await api.put(`/concessionaires/documents/${data.id}`, form);
-      else await api.post(`/concessionaires/${concessionaireId}/documents`, form);
+      // Use FormData so we can send both fields and the file
+      const formData = new FormData();
+      Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+      if (file) formData.append("file", file);
+
+      if (isEdit) {
+        await api.put(`/concessionaires/documents/${data.id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await api.post(`/concessionaires/${concessionaireId}/documents`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
       onSaved();
       onClose();
     } catch (e) {
@@ -44,14 +85,6 @@ export default function DocumentFormModal({ concessionaireId, data, onClose, onS
       setSaving(false);
     }
   };
-
-  const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300";
-  const Field = ({ label, children, required }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -88,17 +121,55 @@ export default function DocumentFormModal({ concessionaireId, data, onClose, onS
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="File Name">
-              <input className={inputClass} value={form.file_name} onChange={e => set("file_name", e.target.value)} placeholder="document.pdf" />
-            </Field>
-            <Field label="File Path / URL">
-              <input className={inputClass} value={form.file_path} onChange={e => set("file_path", e.target.value)} placeholder="/uploads/... or URL" />
-            </Field>
-          </div>
-
           <Field label="Remarks">
             <textarea className={inputClass} rows={2} value={form.remarks} onChange={e => set("remarks", e.target.value)} placeholder="Optional remarks..." />
+          </Field>
+
+          {/* File upload */}
+          <Field label="Attach File">
+            <div
+              className="border-2 border-dashed border-gray-200 rounded-lg px-4 py-5 text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                onChange={handleFileChange}
+              />
+              {file ? (
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-green-700">
+                    <Paperclip size={15} />
+                    <span className="font-medium truncate max-w-[260px]">{file.name}</span>
+                    <span className="text-gray-400">({(file.size / 1024).toFixed(0)} KB)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); clearFile(); }}
+                    className="p-1 text-gray-400 hover:text-red-500 rounded"
+                  >
+                    <FileX size={15} />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-400 space-y-1">
+                  <Paperclip size={20} className="mx-auto text-gray-300" />
+                  {isEdit && data?.file_name ? (
+                    <>
+                      <p className="text-green-700 font-medium">{data.file_name}</p>
+                      <p>Click to replace the file</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium text-gray-500">Click to upload a file</p>
+                      <p>PDF, Word, Excel, or image — max 10MB</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </Field>
         </div>
 

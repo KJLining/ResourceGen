@@ -6,7 +6,7 @@ import ClaimModal from "../components/modals/claimprintingmodal"
 
 const COURSES = [
     "BSIT", "BSCS", "BSEd", "BEEd", "BECE",
-    "BSBA", "BENT", "BSHM", "BSOA", "BAJOURN", "BSPSYCH",
+    "BSBM", "BSENT", "BSHM", "BSOA", "BAJOURN", "BSPSYCH",
 ]
 
 const DOCUMENT_TYPES = ["Thesis", "EDP", "Narrative", "Portfolio"]

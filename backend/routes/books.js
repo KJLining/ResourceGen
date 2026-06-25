@@ -6,6 +6,8 @@ const db = require('../db');
 router.get('/', async (req, res) => {
     try {
         const search = req.query.search ? `%${req.query.search}%` : '%';
+        const publisherId = req.query.publisher_id || null;
+
         const [rows] = await db.query(`
             SELECT b.id, b.title, b.isbn, b.stock_quantity, b.publisher_id,
                    p.name AS publisher_name,
@@ -20,12 +22,14 @@ router.get('/', async (req, res) => {
                     WHERE book_id = b.id AND effective_date <= CURDATE()
                 )
             LEFT JOIN sales s ON s.book_id = b.id
-            WHERE b.title LIKE ? OR p.name LIKE ?
+            WHERE (b.title LIKE ? OR p.name LIKE ?)
+              AND (? IS NULL OR b.publisher_id = ?)
             GROUP BY b.id, b.title, b.isbn, b.stock_quantity,
                      b.publisher_id, p.name, br.selling_price,
                      br.wholesale_price, br.professor_commission, br.school_commission
             ORDER BY b.title ASC
-        `, [search, search]);
+        `, [search, search, publisherId, publisherId]);
+
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });

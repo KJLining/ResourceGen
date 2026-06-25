@@ -2,153 +2,57 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// GET all books with current rate and sales
+// GET all deliveries with items
 router.get('/', async (req, res) => {
     try {
-        const search = req.query.search ? `%${req.query.search}%` : '%';
         const [rows] = await db.query(`
-            SELECT b.id, b.title, b.isbn, b.stock_quantity, b.publisher_id,
-                   p.name AS publisher_name,
-                   br.selling_price, br.wholesale_price,
-                   br.professor_commission, br.school_commission,
-                   IFNULL(SUM(s.quantity), 0) AS total_sold
-            FROM books b
-            JOIN publishers p ON b.publisher_id = p.id
-            LEFT JOIN book_rates br ON br.book_id = b.id
-                AND br.effective_date = (
-                    SELECT MAX(effective_date) FROM book_rates
-                    WHERE book_id = b.id AND effective_date <= CURDATE()
-                )
-            LEFT JOIN sales s ON s.book_id = b.id
-            WHERE b.title LIKE ? OR p.name LIKE ?
-            GROUP BY b.id, b.title, b.isbn, b.stock_quantity,
-                     b.publisher_id, p.name, br.selling_price,
-                     br.wholesale_price, br.professor_commission, br.school_commission
-            ORDER BY b.title ASC
-        `, [search, search]);
+            SELECT 
+                bd.id, bd.delivery_date, bd.reference_no, bd.notes,
+                p.name AS publisher_name,
+                b.title AS book_title,
+                bdi.quantity, bdi.wholesale_price,
+                bdi.id AS item_id, bdi.book_id
+            FROM book_deliveries bd
+            JOIN publishers p ON bd.publisher_id = p.id
+            LEFT JOIN book_delivery_items bdi ON bdi.delivery_id = bd.id
+            LEFT JOIN books b ON bdi.book_id = b.id
+            ORDER BY bd.delivery_date DESC, bd.id DESC
+        `);
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// GET single book with rates and professors
-router.get('/:id', async (req, res) => {
-    try {
-        const [book] = await db.query(`
-            SELECT b.id, b.title, b.isbn, b.stock_quantity,
-                   p.name AS publisher_name,
-                   IFNULL(SUM(s.quantity), 0) AS total_sold
-            FROM books b
-            JOIN publishers p ON b.publisher_id = p.id
-            LEFT JOIN sales s ON s.book_id = b.id
-            WHERE b.id = ?
-            GROUP BY b.id, b.title, b.isbn, b.stock_quantity, p.name
-        `, [req.params.id]);
-
-        if (book.length === 0)
-            return res.status(404).json({ error: 'Book not found' });
-
-        const [rates] = await db.query(`
-            SELECT id, selling_price, wholesale_price,
-                   professor_commission, school_commission, effective_date
-            FROM book_rates WHERE book_id = ?
-            ORDER BY effective_date DESC
-        `, [req.params.id]);
-
-        const [professors] = await db.query(`
-            SELECT p.id, p.name, p.department
-            FROM book_prescriptions bp
-            JOIN professors p ON bp.professor_id = p.id
-            WHERE bp.book_id = ?
-        `, [req.params.id]);
-
-        res.json({ ...book[0], rates, professors });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// POST add book
+// POST record delivery
 router.post('/', async (req, res) => {
     const conn = await db.getConnection();
     try {
-        const { title, isbn, publisher_id, selling_price,
-                wholesale_price, professor_commission,
-                school_commission, professor_ids } = req.body;
+        const { publisher_id, delivery_date, reference_no,
+                book_id, quantity, wholesale_price, notes } = req.body;
 
-        if (!title) return res.status(400).json({ error: 'Title is required' });
-        if (!publisher_id) return res.status(400).json({ error: 'Publisher is required' });
-
-        await conn.beginTransaction();
-
-        const [result] = await conn.query(`
-            INSERT INTO books (title, isbn, publisher_id)
-            VALUES (?, ?, ?)
-        `, [title, isbn || null, publisher_id]);
-
-        const bookId = result.insertId;
-
-        if (selling_price && wholesale_price) {
-            await conn.query(`
-                INSERT INTO book_rates
-                (book_id, selling_price, wholesale_price, professor_commission, school_commission, effective_date)
-                VALUES (?, ?, ?, ?, ?, CURDATE())
-            `, [bookId, selling_price, wholesale_price,
-                professor_commission || 0, school_commission || 0]);
-        }
-
-        if (professor_ids && professor_ids.length > 0) {
-            const values = professor_ids.map(pid => [bookId, pid]);
-            await conn.query(`
-                INSERT INTO book_prescriptions (book_id, professor_id) VALUES ?
-            `, [values]);
-        }
-
-        await conn.commit();
-        res.status(201).json({ id: bookId, title });
-    } catch (err) {
-        await conn.rollback();
-        res.status(500).json({ error: err.message });
-    } finally {
-        conn.release();
-    }
-});
-
-// PUT update book
-router.put('/:id', async (req, res) => {
-    const conn = await db.getConnection();
-    try {
-        const { title, isbn, publisher_id, selling_price,
-                wholesale_price, professor_commission,
-                school_commission, professor_ids } = req.body;
-
-        if (!title) return res.status(400).json({ error: 'Title is required' });
+        if (!publisher_id)   return res.status(400).json({ error: 'Publisher is required' });
+        if (!delivery_date)  return res.status(400).json({ error: 'Delivery date is required' });
+        if (!book_id)        return res.status(400).json({ error: 'Book is required' });
+        if (!quantity || quantity < 1) return res.status(400).json({ error: 'Quantity must be at least 1' });
+        if (!wholesale_price) return res.status(400).json({ error: 'Wholesale price is required' });
 
         await conn.beginTransaction();
+
+        const [deliveryResult] = await conn.query(`
+            INSERT INTO book_deliveries (publisher_id, delivery_date, reference_no, notes)
+            VALUES (?, ?, ?, ?)
+        `, [publisher_id, delivery_date, reference_no || null, notes || null]);
+
+        const deliveryId = deliveryResult.insertId;
 
         await conn.query(`
-            UPDATE books SET title = ?, isbn = ?, publisher_id = ?
-            WHERE id = ?
-        `, [title, isbn || null, publisher_id, req.params.id]);
-
-        if (selling_price && wholesale_price) {
-            await conn.query(`
-                INSERT INTO book_rates
-                (book_id, selling_price, wholesale_price, professor_commission, school_commission, effective_date)
-                VALUES (?, ?, ?, ?, ?, CURDATE())
-            `, [req.params.id, selling_price, wholesale_price,
-                professor_commission || 0, school_commission || 0]);
-        }
-
-        await conn.query(`DELETE FROM book_prescriptions WHERE book_id = ?`, [req.params.id]);
-        if (professor_ids && professor_ids.length > 0) {
-            const values = professor_ids.map(pid => [req.params.id, pid]);
-            await conn.query(`INSERT INTO book_prescriptions (book_id, professor_id) VALUES ?`, [values]);
-        }
+            INSERT INTO book_delivery_items (delivery_id, book_id, quantity, wholesale_price)
+            VALUES (?, ?, ?, ?)
+        `, [deliveryId, book_id, quantity, wholesale_price]);
 
         await conn.commit();
-        res.json({ id: req.params.id, title });
+        res.status(201).json({ id: deliveryId });
     } catch (err) {
         await conn.rollback();
         res.status(500).json({ error: err.message });
@@ -157,13 +61,34 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE book
+// DELETE delivery (and its items)
 router.delete('/:id', async (req, res) => {
+    const conn = await db.getConnection();
     try {
-        await db.query(`DELETE FROM books WHERE id = ?`, [req.params.id]);
-        res.json({ message: 'Book deleted' });
+        const [items] = await conn.query(
+            `SELECT book_id, quantity FROM book_delivery_items WHERE delivery_id = ?`,
+            [req.params.id]
+        );
+
+        await conn.beginTransaction();
+
+        for (const item of items) {
+            await conn.query(
+                `UPDATE books SET stock_quantity = stock_quantity - ? WHERE id = ?`,
+                [item.quantity, item.book_id]
+            );
+        }
+
+        await conn.query(`DELETE FROM book_delivery_items WHERE delivery_id = ?`, [req.params.id]);
+        await conn.query(`DELETE FROM book_deliveries WHERE id = ?`, [req.params.id]);
+
+        await conn.commit();
+        res.json({ message: 'Delivery deleted' });
     } catch (err) {
+        await conn.rollback();
         res.status(500).json({ error: err.message });
+    } finally {
+        conn.release();
     }
 });
 
